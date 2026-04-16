@@ -72,6 +72,32 @@
     50% { transform: scale(1.12); opacity: 1; }
   }
 
+  /* level 5: white orb, slow and powerful */
+  .hero.lv-5 .hero-glow {
+    inset: -40px;
+    filter: blur(60px);
+    animation: orbMax 6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes orbMax {
+    0%, 100% { transform: scale(0.9); opacity: 0.7; }
+    50% { transform: scale(1.25); opacity: 1; }
+  }
+
+  /* level 1: red flicker, unstable */
+  .hero.lv-1 .hero-glow {
+    inset: -30px;
+    filter: blur(45px);
+    animation: orbCrit 1.5s ease-in-out infinite;
+  }
+
+  @keyframes orbCrit {
+    0%, 100% { transform: scale(1); opacity: 0.8; }
+    25% { transform: scale(0.85); opacity: 0.4; }
+    50% { transform: scale(1.05); opacity: 0.9; }
+    75% { transform: scale(0.9); opacity: 0.3; }
+  }
+
   .hero-num {
     position: relative;
     font-size: 144px;
@@ -309,7 +335,7 @@
     <div class="sel" data-n="2" onclick="setLevel(2)" style="--sel-color:#a84">2</div>
     <div class="sel" data-n="3" onclick="setLevel(3)" style="--sel-color:#aa8">3</div>
     <div class="sel" data-n="4" onclick="setLevel(4)" style="--sel-color:#8a6">4</div>
-    <div class="sel" data-n="5" onclick="setLevel(5)" style="--sel-color:#4a9">5</div>
+    <div class="sel" data-n="5" onclick="setLevel(5)" style="--sel-color:#e0e0e0">5</div>
   </div>
 
   <div class="log-area">
@@ -330,7 +356,7 @@
 
 <script>
 const LEVELS = {
-  5: { signal: 'full signal', desc: 'sharp. take on hard work, social events, creative sessions.', color: '#4a9', glow: '#4a9' },
+  5: { signal: 'full signal', desc: 'sharp. take on hard work, social events, creative sessions.', color: '#e0e0e0', glow: '#ffffff' },
   4: { signal: 'running clean', desc: 'slight hum in the background. normal operating mode.', color: '#8a6', glow: '#8a6' },
   3: { signal: 'inputs rising', desc: 'attention splitting. wrap up. no new commitments.', color: '#aa8', glow: '#aa8' },
   2: { signal: 'overload', desc: 'exit the environment. decompress alone. no decisions.', color: '#a84', glow: '#a84' },
@@ -375,7 +401,7 @@ function showLevel(n, animate) {
   const sig = document.getElementById('signal');
   const desc = document.getElementById('desc');
 
-  hero.classList.add('on');
+  hero.className = 'hero on lv-' + n;
   glow.style.background = `radial-gradient(circle, ${l.glow}30 0%, ${l.glow}10 40%, transparent 70%)`;
 
   if (animate && prev !== null) {
@@ -477,7 +503,7 @@ function confirmReset() {
     resetPending = false;
     localStorage.removeItem(STORE);
     current = null;
-    document.getElementById('hero').classList.remove('on');
+    document.getElementById('hero').className = 'hero';
     document.getElementById('heroNum').textContent = '\u2014';
     document.getElementById('heroNum').style.color = '#1a1a1a';
     document.getElementById('heroGlow').style.background = 'none';
