@@ -19,25 +19,66 @@
     user-select: none;
   }
 
-  /* viewport: holds both views side by side */
-  .viewport {
+  /* layout: two panels */
+  .layout {
     display: flex;
-    width: 200%;
     height: 100dvh;
-    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 100%;
   }
 
-  .viewport.show-cal {
-    transform: translateX(-50%);
-  }
-
-  .view {
-    width: 50%;
-    height: 100%;
+  .main-panel {
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
+    transition: flex 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cal-panel {
+    flex: 0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: flex 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .layout.split .main-panel {
+    flex: 0 0 35%;
+  }
+
+  .layout.split .cal-panel {
+    flex: 0 0 65%;
+    opacity: 1;
+    border-left: 1px solid #141414;
+  }
+
+  /* when split, condense the main view */
+  .layout.split .shell {
+    transform: scale(0.75);
+    transform-origin: center center;
+  }
+
+  .layout.split .log-area,
+  .layout.split .cal-link,
+  .layout.split .controls,
+  .layout.split .desc {
+    opacity: 0;
+    pointer-events: none;
+    height: 0;
+    margin: 0;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .layout.split .selector {
+    margin-bottom: 0;
   }
 
   .shell {
@@ -47,8 +88,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    position: relative;
-    z-index: 1;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   /* intro stagger */
@@ -73,7 +113,10 @@
     text-transform: uppercase;
     color: #444;
     margin-bottom: 64px;
+    transition: margin 0.6s ease;
   }
+
+  .layout.split .title { margin-bottom: 32px; }
 
   /* the number */
   .hero {
@@ -84,6 +127,13 @@
     width: 200px;
     height: 200px;
     margin-bottom: 24px;
+    transition: width 0.6s ease, height 0.6s ease;
+  }
+
+  .layout.split .hero {
+    width: 140px;
+    height: 140px;
+    margin-bottom: 16px;
   }
 
   .hero-glow {
@@ -137,9 +187,11 @@
     line-height: 1;
     color: #1a1a1a;
     z-index: 1;
-    transition: color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: color 0.6s cubic-bezier(0.4, 0, 0.2, 1), font-size 0.6s ease;
     transform-origin: center;
   }
+
+  .layout.split .hero-num { font-size: 100px; }
 
   .hero-num.swap-out { animation: numOut 0.2s cubic-bezier(0.4, 0, 1, 1) forwards; }
   .hero-num.swap-in { animation: numIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
@@ -178,7 +230,7 @@
     max-width: 320px;
     min-height: 32px;
     margin-bottom: 48px;
-    transition: color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: color 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease, height 0.4s ease, margin 0.4s ease;
   }
 
   .desc.fade { animation: textSwap 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -193,7 +245,10 @@
     display: flex;
     gap: 12px;
     margin-bottom: 48px;
+    transition: gap 0.6s ease, margin 0.6s ease;
   }
+
+  .layout.split .selector { gap: 8px; }
 
   .sel {
     width: 48px;
@@ -211,8 +266,11 @@
     transition: color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
                 border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
                 background 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                width 0.6s ease, height 0.6s ease;
   }
+
+  .layout.split .sel { width: 36px; height: 36px; font-size: 12px; }
 
   .sel:active { transform: scale(0.88); }
 
@@ -240,6 +298,7 @@
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     margin-bottom: 16px;
+    transition: opacity 0.4s ease;
   }
 
   .log-area::-webkit-scrollbar { width: 2px; }
@@ -288,13 +347,13 @@
     cursor: pointer;
     margin-bottom: 24px;
     padding: 6px 0;
-    transition: color 0.3s ease;
+    transition: color 0.3s ease, opacity 0.4s ease;
   }
 
   .cal-link:hover { color: #888; }
 
   /* bottom controls */
-  .controls { display: flex; gap: 6px; }
+  .controls { display: flex; gap: 6px; transition: opacity 0.4s ease; }
 
   .ctrl-btn {
     font-family: 'JetBrains Mono', monospace;
@@ -324,31 +383,29 @@
     pointer-events: none;
   }
 
-  /* ============ CALENDAR VIEW ============ */
+  /* ============ CALENDAR ============ */
   .cal-shell {
     width: 100%;
-    max-width: 400px;
-    padding: 0 24px;
+    max-width: 460px;
+    padding: 0 32px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    position: relative;
-    z-index: 1;
   }
 
-  .cal-back {
-    align-self: flex-start;
+  .cal-close {
+    align-self: flex-end;
     font-size: 10px;
     letter-spacing: 2px;
     text-transform: uppercase;
     color: #555;
     cursor: pointer;
     padding: 8px 0;
-    margin-bottom: 32px;
+    margin-bottom: 24px;
     transition: color 0.3s ease;
   }
 
-  .cal-back:hover { color: #999; }
+  .cal-close:hover { color: #999; }
 
   .cal-nav {
     display: flex;
@@ -404,47 +461,34 @@
   .cal-day {
     aspect-ratio: 1;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
     font-size: 11px;
-    color: #333;
-    border-radius: 50%;
+    color: #444;
+    border-radius: 8px;
+    border: 1px solid #1a1a1a;
     cursor: default;
     position: relative;
-    transition: background 0.3s ease, color 0.3s ease;
+    transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
   }
 
-  .cal-day.empty { cursor: default; }
+  .cal-day.empty { border-color: transparent; }
 
   .cal-day.has-log {
     cursor: pointer;
-    color: #666;
+    color: #050505;
+    font-weight: 600;
   }
 
-  .cal-day.has-log:hover {
-    background: #1a1a1a;
-  }
+  .cal-day.has-log:hover { opacity: 0.8; }
 
   .cal-day.selected {
-    background: #1a1a1a;
-    color: #ccc;
+    border-color: #888;
+    box-shadow: 0 0 8px rgba(255,255,255,0.1);
   }
 
-  .cal-day.today {
-    border: 1px solid #333;
-  }
+  .cal-day.today { border-color: #555; }
 
-  .cal-dot {
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    margin-top: 2px;
-    position: absolute;
-    bottom: 4px;
-  }
-
-  /* day detail */
   .cal-detail {
     width: 100%;
     min-height: 60px;
@@ -489,7 +533,69 @@
   .cal-detail-row:nth-child(3) { animation-delay: 0.06s; }
   .cal-detail-row:nth-child(4) { animation-delay: 0.09s; }
 
-  /* mobile */
+  /* mobile: full slide instead of split */
+  @media (max-width: 768px) {
+    .layout {
+      width: 200%;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .main-panel {
+      flex: 0 0 50% !important;
+      transition: none;
+    }
+
+    .cal-panel {
+      flex: 0 0 50% !important;
+      opacity: 1 !important;
+      border-left: none !important;
+    }
+
+    .layout.split {
+      transform: translateX(-50%);
+    }
+
+    .layout.split .shell {
+      transform: none;
+    }
+
+    .layout.split .log-area,
+    .layout.split .desc {
+      opacity: 1;
+      pointer-events: auto;
+      height: auto;
+      margin-bottom: 48px;
+      min-height: 32px;
+      overflow: visible;
+    }
+
+    .layout.split .cal-link {
+      opacity: 1;
+      pointer-events: auto;
+      height: auto;
+      margin-bottom: 24px;
+    }
+
+    .layout.split .controls {
+      opacity: 1;
+      pointer-events: auto;
+      height: auto;
+    }
+
+    .layout.split .selector {
+      margin-bottom: 48px;
+    }
+
+    .layout.split .hero {
+      width: 160px;
+      height: 160px;
+    }
+
+    .layout.split .hero-num { font-size: 112px; }
+    .layout.split .sel { width: 44px; height: 44px; font-size: 14px; }
+    .layout.split .title { margin-bottom: 40px; }
+  }
+
   @media (max-width: 480px) {
     .shell { padding: 0 24px; }
     .title { margin-bottom: 40px; }
@@ -514,10 +620,10 @@
 
 <canvas class="particles" id="particles"></canvas>
 
-<div class="viewport" id="viewport">
+<div class="layout" id="layout">
 
-  <!-- MAIN VIEW -->
-  <div class="view">
+  <!-- MAIN -->
+  <div class="main-panel">
     <div class="shell">
       <div class="title intro intro-1">bandwidth</div>
 
@@ -543,7 +649,7 @@
         </div>
       </div>
 
-      <div class="cal-link intro intro-6" onclick="openCalendar()">view calendar</div>
+      <div class="cal-link intro intro-6" onclick="openCalendar()">view calendar &rsaquo;</div>
 
       <div class="controls intro intro-7">
         <label class="ctrl-btn import-wrap">
@@ -556,10 +662,10 @@
     </div>
   </div>
 
-  <!-- CALENDAR VIEW -->
-  <div class="view">
+  <!-- CALENDAR -->
+  <div class="cal-panel">
     <div class="cal-shell">
-      <div class="cal-back" onclick="closeCalendar()">&larr; back</div>
+      <div class="cal-close" onclick="closeCalendar()">close &times;</div>
 
       <div class="cal-nav">
         <div class="cal-arrow" onclick="calPrev()">&lsaquo;</div>
@@ -770,11 +876,11 @@ function openCalendar() {
   calMonth = now.getMonth();
   calSelectedDay = null;
   renderCalendar();
-  document.getElementById('viewport').classList.add('show-cal');
+  document.getElementById('layout').classList.add('split');
 }
 
 function closeCalendar() {
-  document.getElementById('viewport').classList.remove('show-cal');
+  document.getElementById('layout').classList.remove('split');
 }
 
 function calPrev() {
@@ -792,22 +898,15 @@ function calNext() {
 }
 
 function getLogsForDay(year, month, day) {
-  const log = load();
-  return log.filter(e => {
+  return load().filter(e => {
     const d = new Date(e.ts);
     return d.getFullYear() === year && d.getMonth() === month && d.getDate() === day;
   });
 }
 
-function getDayKey(year, month, day) {
-  return `${year}-${month}-${day}`;
-}
-
 function renderCalendar() {
-  // header
   document.getElementById('calMonthLabel').textContent = `${MONTHS[calMonth]} ${calYear}`;
 
-  // build log index for this month
   const log = load();
   const dayMap = {};
   log.forEach(e => {
@@ -819,7 +918,6 @@ function renderCalendar() {
     }
   });
 
-  // grid
   const grid = document.getElementById('calGrid');
   const firstDay = new Date(calYear, calMonth, 1).getDay();
   const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
@@ -827,11 +925,7 @@ function renderCalendar() {
   const isCurrentMonth = today.getFullYear() === calYear && today.getMonth() === calMonth;
 
   let html = '';
-
-  // empty cells before first day
-  for (let i = 0; i < firstDay; i++) {
-    html += '<div class="cal-day empty"></div>';
-  }
+  for (let i = 0; i < firstDay; i++) html += '<div class="cal-day empty"></div>';
 
   for (let d = 1; d <= daysInMonth; d++) {
     const logs = dayMap[d];
@@ -844,20 +938,17 @@ function renderCalendar() {
     if (isToday) cls += ' today';
     if (isSelected) cls += ' selected';
 
-    let dot = '';
+    let style = '';
     if (hasLog) {
-      // use the last log's level color for the dot
       const lastLevel = logs[logs.length - 1].level;
       const color = LEVELS[lastLevel].color;
-      dot = `<div class="cal-dot" style="background:${color}"></div>`;
+      style = `background:${color}22; border-color:${color}44;`;
     }
 
-    html += `<div class="${cls}" onclick="selectDay(${d})">${d}${dot}</div>`;
+    html += `<div class="${cls}" style="${style}" onclick="selectDay(${d})">${d}</div>`;
   }
 
   grid.innerHTML = html;
-
-  // render detail
   renderDayDetail();
 }
 
@@ -868,27 +959,21 @@ function selectDay(day) {
 
 function renderDayDetail() {
   const el = document.getElementById('calDetail');
-
   if (!calSelectedDay) {
     el.innerHTML = '<div class="cal-detail-empty">select a day</div>';
     return;
   }
-
   const logs = getLogsForDay(calYear, calMonth, calSelectedDay);
-
+  const mo = MONTHS[calMonth].slice(0, 3);
   if (!logs.length) {
-    const mo = MONTHS[calMonth].slice(0, 3);
     el.innerHTML = `<div class="cal-detail-date">${mo} ${calSelectedDay}, ${calYear}</div><div class="cal-detail-empty">no readings</div>`;
     return;
   }
-
-  const mo = MONTHS[calMonth].slice(0, 3);
   let html = `<div class="cal-detail-date">${mo} ${calSelectedDay}, ${calYear}</div>`;
   logs.forEach(e => {
     const l = LEVELS[e.level];
     html += `<div class="cal-detail-row"><span>${fmtTimeShort(e.ts)}</span><span style="color:${l.color}">${e.level} ${l.signal}</span></div>`;
   });
-
   el.innerHTML = html;
 }
 
@@ -935,11 +1020,9 @@ function renderDayDetail() {
 
   function tick() {
     const lv = current || 0;
-    const targetVY = SPEEDS[lv];
-    const targetColor = COLORS[lv];
-
-    currentVY += (targetVY - currentVY) * 0.02;
-    for (let i = 0; i < 3; i++) currentColor[i] += (targetColor[i] - currentColor[i]) * 0.03;
+    currentVY += (SPEEDS[lv] - currentVY) * 0.02;
+    const tc = COLORS[lv];
+    for (let i = 0; i < 3; i++) currentColor[i] += (tc[i] - currentColor[i]) * 0.03;
 
     ctx.clearRect(0, 0, W, H);
 
