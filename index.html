@@ -354,8 +354,8 @@
   /* ============ CALENDAR ============ */
   .cal-shell {
     width: 100%;
-    max-width: 600px;
-    padding: 0 40px;
+    max-width: 800px;
+    padding: 0 48px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -396,8 +396,8 @@
   .cal-arrow:active { transform: scale(0.9); }
 
   .cal-month-label {
-    font-size: 11px;
-    letter-spacing: 4px;
+    font-size: 13px;
+    letter-spacing: 5px;
     text-transform: uppercase;
     color: #666;
   }
@@ -410,7 +410,7 @@
   }
 
   .cal-weekday {
-    font-size: 8px;
+    font-size: 10px;
     letter-spacing: 2px;
     text-transform: uppercase;
     color: #333;
@@ -421,7 +421,7 @@
   .cal-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 6px;
+    gap: 8px;
     width: 100%;
     margin-bottom: 24px;
   }
@@ -431,9 +431,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 13px;
+    font-size: 14px;
     color: #444;
-    border-radius: 10px;
+    border-radius: 12px;
     border: 1px solid #1a1a1a;
     cursor: default;
     position: relative;
@@ -455,7 +455,20 @@
     box-shadow: 0 0 8px rgba(255,255,255,0.1);
   }
 
-  .cal-day.today { border-color: #555; }
+  .cal-day.today {
+    border-color: #666;
+    color: #ccc;
+  }
+
+  .cal-day.today::after {
+    content: 'today';
+    position: absolute;
+    bottom: 3px;
+    font-size: 6px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #666;
+  }
 
   .cal-detail {
     width: 100%;
