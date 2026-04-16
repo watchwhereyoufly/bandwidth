@@ -247,6 +247,30 @@
     );
   }
 
+  /* reset button */
+  .reset-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #333;
+    background: none;
+    border: 1px solid #1a1a1a;
+    padding: 8px 20px;
+    cursor: pointer;
+    transition: color 0.3s ease, border-color 0.3s ease;
+  }
+
+  .reset-btn:hover {
+    color: #a44;
+    border-color: #a44;
+  }
+
+  .reset-btn.confirm {
+    color: #a44;
+    border-color: #a44;
+  }
+
   /* mobile */
   @media (max-width: 480px) {
     .container { gap: 24px; padding: 0 20px; }
@@ -318,7 +342,8 @@
     </div>
   </div>
 
-  <div class="hint">keys 1-5 to set / r to reset</div>
+  <div class="hint">keys 1-5 to set</div>
+  <button class="reset-btn" id="resetBtn" onclick="confirmReset()">clear log</button>
 </div>
 
 <script>
@@ -426,16 +451,37 @@ function setLevel(n) {
 document.addEventListener('keydown', e => {
   const n = parseInt(e.key);
   if (n >= 1 && n <= 5) setLevel(n);
-  if (e.key === 'r' || e.key === 'R') {
+});
+
+// reset with confirmation
+let resetPending = false;
+let resetTimeout = null;
+
+function confirmReset() {
+  const btn = document.getElementById('resetBtn');
+  if (!resetPending) {
+    resetPending = true;
+    btn.textContent = 'confirm clear';
+    btn.classList.add('confirm');
+    resetTimeout = setTimeout(() => {
+      resetPending = false;
+      btn.textContent = 'clear log';
+      btn.classList.remove('confirm');
+    }, 3000);
+  } else {
+    clearTimeout(resetTimeout);
+    resetPending = false;
     localStorage.removeItem(STORAGE_KEY);
     currentLevel = null;
     document.querySelectorAll('.bar').forEach(b => b.classList.remove('active', 'below'));
     document.getElementById('statusSignal').textContent = 'press 1-5';
     document.getElementById('statusSignal').style.color = '';
     document.getElementById('statusDesc').textContent = 'or tap a level to check in';
+    btn.textContent = 'clear log';
+    btn.classList.remove('confirm');
     renderLog();
   }
-});
+}
 
 // restore last state
 (function init() {
