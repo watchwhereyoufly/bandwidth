@@ -182,9 +182,14 @@
   /* log */
   .log-wrap {
     width: 100%;
-    max-height: 100px;
-    overflow: hidden;
+    max-height: 140px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
+
+  .log-wrap::-webkit-scrollbar { width: 3px; }
+  .log-wrap::-webkit-scrollbar-track { background: transparent; }
+  .log-wrap::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; }
 
   .log {
     display: flex;
@@ -408,7 +413,7 @@ function renderLog() {
     return;
   }
 
-  const recent = log.slice(-6).reverse();
+  const recent = log.slice().reverse();
   el.innerHTML = recent.map(entry => {
     const d = DATA[entry.level];
     return `<div class="log-entry">
