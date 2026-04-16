@@ -86,16 +86,20 @@
 
   /* level 1: red flicker, unstable */
   .hero.lv-1 .hero-glow {
-    inset: -30px;
-    filter: blur(45px);
-    animation: orbCrit 1.5s ease-in-out infinite;
+    inset: -40px;
+    filter: blur(50px);
+    background: radial-gradient(circle, #a44 0%, #a4440a 50%, transparent 70%) !important;
+    animation: orbCrit 1.2s ease-in-out infinite;
   }
 
   @keyframes orbCrit {
-    0%, 100% { transform: scale(1); opacity: 0.8; }
-    25% { transform: scale(0.85); opacity: 0.4; }
-    50% { transform: scale(1.05); opacity: 0.9; }
-    75% { transform: scale(0.9); opacity: 0.3; }
+    0% { transform: scale(1); opacity: 1; }
+    15% { transform: scale(0.7); opacity: 0.2; }
+    30% { transform: scale(1.1); opacity: 0.9; }
+    45% { transform: scale(0.75); opacity: 0.15; }
+    60% { transform: scale(1.05); opacity: 0.85; }
+    80% { transform: scale(0.8); opacity: 0.25; }
+    100% { transform: scale(1); opacity: 1; }
   }
 
   .hero-num {
@@ -285,6 +289,7 @@
     background: none;
     border: 1px solid #141414;
     padding: 7px 16px;
+    border-radius: 20px;
     cursor: pointer;
     transition: color 0.3s ease, border-color 0.3s ease;
   }
