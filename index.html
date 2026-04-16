@@ -393,11 +393,9 @@ function renderLog() {
   }).join('');
 }
 
-function setLevel(n) {
-  if (n < 1 || n > 5) return;
+function showLevel(n) {
   currentLevel = n;
 
-  // update bars
   document.querySelectorAll('.bar').forEach(bar => {
     const lvl = parseInt(bar.dataset.level);
     bar.classList.remove('active', 'below');
@@ -405,18 +403,20 @@ function setLevel(n) {
     else if (lvl < n) bar.classList.add('below');
   });
 
-  // update status
   const d = DATA[n];
   const sig = document.getElementById('statusSignal');
   const desc = document.getElementById('statusDesc');
   sig.textContent = d.signal;
   sig.style.color = d.color;
   desc.textContent = d.desc;
+}
 
-  // log it
+function setLevel(n) {
+  if (n < 1 || n > 5) return;
+  showLevel(n);
+
   const log = getLog();
   log.push({ level: n, ts: Date.now() });
-  // keep last 100
   if (log.length > 100) log.splice(0, log.length - 100);
   saveLog(log);
   renderLog();
@@ -444,7 +444,7 @@ document.addEventListener('keydown', e => {
     const last = log[log.length - 1];
     // only restore if within last 12 hours
     if (Date.now() - last.ts < 12 * 60 * 60 * 1000) {
-      setLevel(last.level);
+      showLevel(last.level);
     }
   }
   renderLog();
