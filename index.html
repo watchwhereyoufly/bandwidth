@@ -31,12 +31,26 @@
     align-items: center;
   }
 
+  /* intro stagger */
+  @keyframes fadeUp {
+    0% { opacity: 0; transform: translateY(12px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  .intro { animation: fadeUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) backwards; }
+  .intro-1 { animation-delay: 0.1s; }
+  .intro-2 { animation-delay: 0.25s; }
+  .intro-3 { animation-delay: 0.4s; }
+  .intro-4 { animation-delay: 0.55s; }
+  .intro-5 { animation-delay: 0.7s; }
+  .intro-6 { animation-delay: 0.85s; }
+
   /* title */
   .title {
     font-size: 9px;
     letter-spacing: 8px;
     text-transform: uppercase;
-    color: #2a2a2a;
+    color: #444;
     margin-bottom: 64px;
   }
 
@@ -146,7 +160,7 @@
   .desc {
     font-size: 10px;
     letter-spacing: 1px;
-    color: #282828;
+    color: #3a3a3a;
     text-align: center;
     line-height: 1.7;
     max-width: 320px;
@@ -180,11 +194,11 @@
     justify-content: center;
     font-size: 15px;
     font-weight: 500;
-    color: #282828;
+    color: #444;
     cursor: pointer;
     position: relative;
     border-radius: 50%;
-    border: 1px solid #1a1a1a;
+    border: 1px solid #2a2a2a;
     transition: color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
                 border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
                 background 0.4s cubic-bezier(0.4, 0, 0.2, 1),
@@ -241,7 +255,7 @@
     justify-content: space-between;
     font-size: 9px;
     letter-spacing: 1px;
-    color: #1e1e1e;
+    color: #333;
     padding: 3px 0;
     animation: logIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) backwards;
   }
@@ -264,7 +278,7 @@
   .log-empty {
     font-size: 9px;
     letter-spacing: 3px;
-    color: #1a1a1a;
+    color: #333;
     text-align: center;
     text-transform: uppercase;
   }
@@ -280,9 +294,9 @@
     font-size: 8px;
     letter-spacing: 2px;
     text-transform: uppercase;
-    color: #1e1e1e;
+    color: #444;
     background: none;
-    border: 1px solid #141414;
+    border: 1px solid #2a2a2a;
     padding: 7px 16px;
     border-radius: 20px;
     cursor: pointer;
@@ -297,6 +311,19 @@
   }
 
   .import-wrap input { display: none; }
+
+  /* particles */
+  .particles {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .shell {
+    position: relative;
+    z-index: 1;
+  }
 
   /* mobile */
   @media (max-width: 480px) {
@@ -319,18 +346,19 @@
 </head>
 <body>
 
+<canvas class="particles" id="particles"></canvas>
 <div class="shell">
-  <div class="title">bandwidth</div>
+  <div class="title intro intro-1">bandwidth</div>
 
-  <div class="hero" id="hero">
+  <div class="hero intro intro-2" id="hero">
     <div class="hero-glow" id="heroGlow"></div>
     <div class="hero-num" id="heroNum">&mdash;</div>
   </div>
 
-  <div class="signal" id="signal"></div>
-  <div class="desc" id="desc">tap a level to check in</div>
+  <div class="signal intro intro-3" id="signal"></div>
+  <div class="desc intro intro-3" id="desc">tap a level to check in</div>
 
-  <div class="selector" id="selector">
+  <div class="selector intro intro-4" id="selector">
     <div class="sel" data-n="1" onclick="setLevel(1)" style="--sel-color:#a44">1</div>
     <div class="sel" data-n="2" onclick="setLevel(2)" style="--sel-color:#a84">2</div>
     <div class="sel" data-n="3" onclick="setLevel(3)" style="--sel-color:#8a6">3</div>
@@ -338,13 +366,13 @@
     <div class="sel" data-n="5" onclick="setLevel(5)" style="--sel-color:#e0e0e0">5</div>
   </div>
 
-  <div class="log-area">
+  <div class="log-area intro intro-5">
     <div class="log-list" id="log">
       <div class="log-empty">no readings yet</div>
     </div>
   </div>
 
-  <div class="controls">
+  <div class="controls intro intro-6">
     <button class="ctrl-btn" onclick="exportLog()">export</button>
     <label class="ctrl-btn import-wrap">
       import
@@ -529,6 +557,100 @@ document.addEventListener('keydown', e => {
     if (Date.now() - last.ts < 12 * 60 * 60 * 1000) showLevel(last.level);
   }
   renderLog();
+})();
+
+// particles
+(function particles() {
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  const COUNT = 60;
+  let W, H;
+  const dots = [];
+
+  // velocity per level: negative = up, positive = down
+  const SPEEDS = {
+    0: 0,     // no level selected
+    1: 0.8,   // falling
+    2: 0.3,   // still falling a little
+    3: 0,     // hovering (gentle drift)
+    4: -0.4,  // slightly up
+    5: -1.2   // rising fast
+  };
+
+  // colors per level
+  const COLORS = {
+    0: [30, 30, 30],
+    1: [170, 68, 68],
+    2: [170, 136, 68],
+    3: [136, 170, 102],
+    4: [170, 170, 136],
+    5: [200, 200, 200]
+  };
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function makeDot() {
+    return {
+      x: Math.random() * W,
+      y: Math.random() * H,
+      r: 1 + Math.random() * 1.5,
+      drift: (Math.random() - 0.5) * 0.3,
+      phase: Math.random() * Math.PI * 2,
+      speed: 0.5 + Math.random() * 0.5,
+      alpha: 0.15 + Math.random() * 0.25
+    };
+  }
+
+  resize();
+  window.addEventListener('resize', resize);
+  for (let i = 0; i < COUNT; i++) dots.push(makeDot());
+
+  let targetVY = 0;
+  let currentVY = 0;
+  let targetColor = COLORS[0];
+  let currentColor = [...COLORS[0]];
+
+  function tick() {
+    const lv = current || 0;
+    targetVY = SPEEDS[lv];
+    targetColor = COLORS[lv];
+
+    // smooth interpolation
+    currentVY += (targetVY - currentVY) * 0.02;
+    for (let i = 0; i < 3; i++) currentColor[i] += (targetColor[i] - currentColor[i]) * 0.03;
+
+    ctx.clearRect(0, 0, W, H);
+
+    for (const d of dots) {
+      const vy = currentVY * d.speed;
+      const wobble = Math.sin(Date.now() * 0.001 + d.phase) * 0.15;
+
+      d.y += vy + wobble;
+      d.x += d.drift + Math.sin(Date.now() * 0.0005 + d.phase) * 0.2;
+
+      // wrap around
+      if (d.y < -10) { d.y = H + 10; d.x = Math.random() * W; }
+      if (d.y > H + 10) { d.y = -10; d.x = Math.random() * W; }
+      if (d.x < -10) d.x = W + 10;
+      if (d.x > W + 10) d.x = -10;
+
+      const r = Math.round(currentColor[0]);
+      const g = Math.round(currentColor[1]);
+      const b = Math.round(currentColor[2]);
+
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${r},${g},${b},${d.alpha})`;
+      ctx.fill();
+    }
+
+    requestAnimationFrame(tick);
+  }
+
+  requestAnimationFrame(tick);
 })();
 </script>
 
