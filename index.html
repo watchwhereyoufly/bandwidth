@@ -272,6 +272,18 @@
   }
 
   /* reset button */
+  .btn-row {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .import-label {
+    display: inline-block;
+    cursor: pointer;
+    text-align: center;
+  }
+
   .reset-btn {
     font-family: 'JetBrains Mono', monospace;
     font-size: 9px;
@@ -367,7 +379,14 @@
   </div>
 
   <div class="hint">keys 1-5 to set</div>
-  <button class="reset-btn" id="resetBtn" onclick="confirmReset()">clear log</button>
+  <div class="btn-row">
+    <button class="reset-btn" onclick="exportLog()">export</button>
+    <label class="reset-btn import-label">
+      import
+      <input type="file" accept=".json" onchange="importLog(event)" hidden>
+    </label>
+    <button class="reset-btn" id="resetBtn" onclick="confirmReset()">clear log</button>
+  </div>
 </div>
 
 <script>
@@ -469,6 +488,47 @@ function setLevel(n) {
   if (log.length > 100) log.splice(0, log.length - 100);
   saveLog(log);
   renderLog();
+}
+
+// export / import
+function exportLog() {
+  const log = getLog();
+  if (log.length === 0) return;
+  const blob = new Blob([JSON.stringify(log, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'bandwidth-log.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importLog(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const imported = JSON.parse(ev.target.result);
+      if (!Array.isArray(imported)) return;
+      const existing = getLog();
+      const merged = existing.concat(imported);
+      merged.sort((a, b) => a.ts - b.ts);
+      // dedupe by timestamp
+      const seen = new Set();
+      const deduped = merged.filter(entry => {
+        if (seen.has(entry.ts)) return false;
+        seen.add(entry.ts);
+        return true;
+      });
+      if (deduped.length > 100) deduped.splice(0, deduped.length - 100);
+      saveLog(deduped);
+      renderLog();
+      if (deduped.length > 0) showLevel(deduped[deduped.length - 1].level);
+    } catch {}
+  };
+  reader.readAsText(file);
+  e.target.value = '';
 }
 
 // keyboard
