@@ -50,35 +50,12 @@
   }
 
   .layout.split .main-panel {
-    flex: 0 0 35%;
+    flex: 0 0 33%;
   }
 
   .layout.split .cal-panel {
-    flex: 0 0 65%;
+    flex: 0 0 67%;
     opacity: 1;
-    border-left: 1px solid #141414;
-  }
-
-  /* when split, condense the main view */
-  .layout.split .shell {
-    transform: scale(0.75);
-    transform-origin: center center;
-  }
-
-  .layout.split .log-area,
-  .layout.split .cal-link,
-  .layout.split .controls,
-  .layout.split .desc {
-    opacity: 0;
-    pointer-events: none;
-    height: 0;
-    margin: 0;
-    min-height: 0;
-    overflow: hidden;
-  }
-
-  .layout.split .selector {
-    margin-bottom: 0;
   }
 
   .shell {
@@ -116,7 +93,6 @@
     transition: margin 0.6s ease;
   }
 
-  .layout.split .title { margin-bottom: 32px; }
 
   /* the number */
   .hero {
@@ -130,11 +106,6 @@
     transition: width 0.6s ease, height 0.6s ease;
   }
 
-  .layout.split .hero {
-    width: 140px;
-    height: 140px;
-    margin-bottom: 16px;
-  }
 
   .hero-glow {
     position: absolute;
@@ -191,7 +162,6 @@
     transform-origin: center;
   }
 
-  .layout.split .hero-num { font-size: 100px; }
 
   .hero-num.swap-out { animation: numOut 0.2s cubic-bezier(0.4, 0, 1, 1) forwards; }
   .hero-num.swap-in { animation: numIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
@@ -248,7 +218,6 @@
     transition: gap 0.6s ease, margin 0.6s ease;
   }
 
-  .layout.split .selector { gap: 8px; }
 
   .sel {
     width: 48px;
@@ -270,7 +239,6 @@
                 width 0.6s ease, height 0.6s ease;
   }
 
-  .layout.split .sel { width: 36px; height: 36px; font-size: 12px; }
 
   .sel:active { transform: scale(0.88); }
 
@@ -386,8 +354,8 @@
   /* ============ CALENDAR ============ */
   .cal-shell {
     width: 100%;
-    max-width: 460px;
-    padding: 0 32px;
+    max-width: 600px;
+    padding: 0 40px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -453,7 +421,7 @@
   .cal-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 4px;
+    gap: 6px;
     width: 100%;
     margin-bottom: 24px;
   }
@@ -463,9 +431,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 11px;
+    font-size: 13px;
     color: #444;
-    border-radius: 8px;
+    border-radius: 10px;
     border: 1px solid #1a1a1a;
     cursor: default;
     position: relative;
