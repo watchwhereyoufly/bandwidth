@@ -923,7 +923,7 @@ function renderCalendar() {
     if (hasLog) {
       const lastLevel = logs[logs.length - 1].level;
       const color = LEVELS[lastLevel].color;
-      style = `background:color-mix(in srgb, ${color} 35%, transparent); border-color:color-mix(in srgb, ${color} 50%, transparent);`;
+      style = `background:color-mix(in srgb, ${color} 35%, #050505); border-color:color-mix(in srgb, ${color} 60%, #050505);`;
     }
 
     html += `<div class="${cls}" style="${style}" onclick="selectDay(${d})">${d}</div>`;
